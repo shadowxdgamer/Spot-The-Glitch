@@ -18,25 +18,22 @@ export const MODS = [
 
 // Rarity weights based on level/shop number
 export const getRarityWeights = (level) => {
-  const shopNum = level / 5;
+  const shopNum = Math.max(1, Math.floor(level / 5));
   
-  if (shopNum === 1) {
-    return { common: 50, uncommon: 40, rare: 6, epic: 3, legendary: 1 };
-  }
-  if (shopNum === 2) {
-    return { common: 40, uncommon: 50, rare: 6, epic: 3, legendary: 1 };
-  }
-  if (shopNum === 3) {
-    return { common: 35, uncommon: 45, rare: 10, epic: 7, legendary: 3 };
-  }
+  // Dynamic scaling formulas
+  // Com: 50 -> 45 -> 40
+  const common = Math.max(10, 55 - (shopNum * 5));
+  // Rare: 6 -> 8 -> 10
+  const rare = Math.min(25, 4 + (shopNum * 2));
+  // Epic: 3 -> 4.5 -> 6
+  const epic = Math.min(20, 1.5 + (shopNum * 1.5));
+  // Leg: 1 -> 2 -> 3
+  const legendary = Math.min(15, 0 + (shopNum * 1));
   
-  return {
-    common: Math.max(20, 35 - (shopNum * 2)),
-    uncommon: Math.max(20, 45 - (shopNum * 2)),
-    rare: Math.min(25, 10 + (shopNum * 2)),
-    epic: Math.min(20, 7 + (shopNum * 2)),
-    legendary: Math.min(15, 3 + shopNum)
-  };
+  // Uncommon takes the remainder (~40 -> ~40.5 -> ~41)
+  const uncommon = Math.max(0, 100 - (common + rare + epic + legendary));
+  
+  return { common, uncommon, rare, epic, legendary };
 };
 
 // Pick a random mod based on rarity
@@ -84,13 +81,4 @@ export const pickMod = (level, cleansePercent, cardsToShow, gridSize) => {
   }
 
   return choice;
-};
-    filtered = filtered.filter(m => !m.slot);
-  }
-
-  if (filtered.length === 0) {
-    return MODS[Math.floor(Math.random() * MODS.length)];
-  }
-  
-  return filtered[Math.floor(Math.random() * filtered.length)];
 };
