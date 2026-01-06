@@ -35,6 +35,7 @@ function App() {
     startLevel,
     nextLevel,
     applyProtocol,
+    consumeReroll,
     resetGame
   } = useGameState(audioEngine, handleGameOver, handleLevelComplete);
 
@@ -108,7 +109,7 @@ function App() {
     if (!shopFreeRerollUsed) {
       setShopFreeRerollUsed(true);
     } else if (gameState.rerolls > 0) {
-      // Handled in ProtocolShop component
+      consumeReroll();
     }
   };
 

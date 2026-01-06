@@ -39,7 +39,7 @@ export const ProtocolShop = ({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl">
-      <div className="max-w-5xl w-full text-center flex flex-col max-h-screen py-6">
+      <div className="max-w-7xl w-full text-center flex flex-col max-h-screen py-6">
         <h2 className="text-2xl sm:text-3xl font-black text-cyan-400 glitch-text mb-2 italic uppercase shrink-0">
           Upgrade Protocol
         </h2>
@@ -47,8 +47,8 @@ export const ProtocolShop = ({
           Select system modification
         </p>
         
-        <div className="overflow-y-auto px-2 min-h-0 shrink-1 mb-4 flex-1">
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+        <div className="overflow-y-auto p-4 min-h-0 shrink-1 mb-4 flex-1">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-6">
             {cards.map((mod, index) => (
               <ModCard key={index} mod={mod} onClick={() => handleSelectMod(mod)} />
             ))}

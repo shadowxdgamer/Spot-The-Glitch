@@ -192,6 +192,14 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     setShopFreeRerollUsed(false);
   }, []);
 
+  // Consume a reroll
+  const consumeReroll = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      rerolls: Math.max(0, prev.rerolls - 1)
+    }));
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -208,6 +216,7 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     startLevel,
     nextLevel,
     applyProtocol,
+    consumeReroll,
     resetGame,
     startTimer
   };
