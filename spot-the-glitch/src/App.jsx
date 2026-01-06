@@ -45,6 +45,7 @@ function App() {
         audioEngine.sfx.card();
         setGamePhase('shop');
       } else {
+        setGamePhase('processing');
         nextLevel();
         setTimeout(() => {
           const newLevelData = generateLevelData();
@@ -142,7 +143,7 @@ function App() {
         />
       )}
 
-      {(gamePhase === 'playing' || gamePhase === 'shop') && (
+      {(gamePhase !== 'start' && gamePhase !== 'gameOver') && (
         <>
           <HUD gameState={gameState} />
           {levelData && (
