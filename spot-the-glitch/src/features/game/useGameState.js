@@ -152,13 +152,17 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
       const updated = { ...prev };
       
       if (mod.bp) updated.cleansePercent = Math.min(MAX_CLEANSE_PERCENT, updated.cleansePercent + mod.bp);
-      if (mod.gs) updated.gridSize = Math.min(MAX_GRID_SIZE, updated.gridSize + mod.gs);
-      if (mod.anom) updated.targetsNeeded += mod.anom;
+      if (mod.gs) updated.gridSize = Math.max(4, Math.min(MAX_GRID_SIZE, updated.gridSize + mod.gs));
+      if (mod.anom) updated.targetsNeeded = Math.max(1, updated.targetsNeeded + mod.anom);
       if (mod.time) updated.maxTime += mod.time;
       if (mod.time_m) updated.maxTime = Math.max(MIN_TIME, updated.maxTime + mod.time_m);
       if (mod.life) {
-        updated.maxLives++;
-        updated.lives++;
+        updated.maxLives += mod.life;
+        if (mod.life > 0) updated.lives += mod.life;
+        else updated.lives = Math.min(updated.lives, updated.maxLives);
+      }
+      if (mod.heal) {
+        updated.lives = updated.maxLives;
       }
       if (mod.scr) updated.charTypeIdx = Math.min(3, updated.charTypeIdx + 1);
       if (mod.slot) updated.cardsToShow = Math.min(MAX_CARD_SLOTS, updated.cardsToShow + mod.slot);

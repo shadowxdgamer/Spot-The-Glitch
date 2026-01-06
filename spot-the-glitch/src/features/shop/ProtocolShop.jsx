@@ -17,7 +17,7 @@ export const ProtocolShop = ({
   const generateCards = () => {
     const newCards = [];
     for (let i = 0; i < gameState.cardsToShow; i++) {
-      const mod = pickMod(gameState.level, gameState.cleansePercent, gameState.cardsToShow);
+      const mod = pickMod(gameState.level, gameState.cleansePercent, gameState.cardsToShow, gameState.gridSize);
       newCards.push(mod);
     }
     setCards(newCards);
@@ -86,10 +86,11 @@ const ModCard = ({ mod, onClick }) => {
           {mod.bp && `Cleanse ${mod.bp}% of grid`}
           {mod.time && `+${mod.time}s max limit`}
           {mod.time_m && `${mod.time_m}s global limit`}
-          {mod.life && `+1 Stability Node`}
+          {mod.life && mod.life > 0 && `+${mod.life} Stability Node`}
           {mod.slot && `+1 Choice Slot (Next)`}
           {mod.rr && `+${mod.rr} Rerolls`}
           {mod.scr && `Scramble complexity`}
+          {mod.heal && `Full System Restore`}
         </div>
       </div>
       <div className="border-t border-white/5 pt-4">
@@ -97,9 +98,12 @@ const ModCard = ({ mod, onClick }) => {
           CON: {mod.c}
         </div>
         <div className="text-[9px] text-slate-500 mt-1 uppercase font-bold">
-          {mod.gs && `+${mod.gs} Array Dimension`}
-          {mod.anom && `+${mod.anom} Anomaly count`}
-          {mod.time_m && `Reduced thinking time`}
+          {mod.gs && mod.gs > 0 && `+${mod.gs} Array Dimension`}
+          {mod.time_m && mod.time_m < 0 && `Reduced Thinking Time`}
+          {mod.life && mod.life < 0 && `-1 Max Stability`}
+          {mod.gs && mod.gs < 0 && `Compact Grid`}
+          {mod.anom && mod.anom > 0 && `+${mod.anom} Anomaly count`}
+          {mod.time_m && mod.time_m > 0 && `Reduced thinking time`}
         </div>
       </div>
     </div>

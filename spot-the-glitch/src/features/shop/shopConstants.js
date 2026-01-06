@@ -9,7 +9,11 @@ export const MODS = [
   { id: 'time_up', b: 'Buffer Node', c: 'None', r: 'Rare', time: 5 },
   { id: 'cleanse_epic', b: 'Void Protocol', c: 'Double Expansion', r: 'Epic', bp: 30, gs: 2 },
   { id: 'target_up', b: 'Multi-Core', c: 'Energy Drain', r: 'Epic', life: 1, anom: 1, time_m: -1 },
-  { id: 'cleanse_leg', b: 'Ghost Protocol', c: 'Maximum Chaos', r: 'Legendary', bp: 45, anom: 2, gs: 1 }
+  { id: 'focus_mode', b: 'Target Isolation', c: 'Visual Noise', r: 'Epic', anom: -1, gs: 2 },
+  { id: 'cleanse_leg', b: 'Ghost Protocol', c: 'Maximum Chaos', r: 'Legendary', bp: 45, anom: 2, gs: 1 },
+  { id: 'sys_restore', b: 'System Restore', c: 'Hard Reset', r: 'Legendary', heal: true, life: 1, time_m: -2 },
+  { id: 'lucky_glitch', b: 'Lucky Packet', c: 'Stability Leak', r: 'Rare', rr: 5, bp: 10, life: -1 },
+  { id: 'zip_bomb', b: 'Grid Compression', c: 'Malware Bloom', r: 'Rare', gs: -1, anom: 2 }
 ];
 
 // Rarity weights based on level/shop number
@@ -36,7 +40,7 @@ export const getRarityWeights = (level) => {
 };
 
 // Pick a random mod based on rarity
-export const pickMod = (level, cleansePercent, cardsToShow) => {
+export const pickMod = (level, cleansePercent, cardsToShow, gridSize) => {
   const weights = getRarityWeights(level);
   const r = Math.random() * 100;
   let rarity = 'Common';
@@ -60,6 +64,27 @@ export const pickMod = (level, cleansePercent, cardsToShow) => {
   
   // Filter out slot mods if already at max
   if (cardsToShow >= 5) {
+    filtered = filtered.filter(m => !m.slot);
+  }
+
+  // If filtered is empty, pick any mod
+  let choice = filtered.length > 0
+    ? filtered[Math.floor(Math.random() * filtered.length)]
+    : MODS[Math.floor(Math.random() * MODS.length)];
+
+  // Handle Focus Mode absolute grid limit
+  // If grid is too large to expand, change the penalty
+  if (choice.id === 'focus_mode' && gridSize >= 15) {
+    return {
+      ...choice,
+      c: 'Time Compression',
+      gs: 0,
+      time_m: -2
+    };
+  }
+
+  return choice;
+};
     filtered = filtered.filter(m => !m.slot);
   }
 
