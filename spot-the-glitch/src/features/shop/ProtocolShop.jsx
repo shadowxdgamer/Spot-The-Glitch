@@ -39,27 +39,31 @@ export const ProtocolShop = ({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl">
-      <div className="max-w-5xl w-full text-center">
-        <h2 className="text-3xl font-black text-cyan-400 glitch-text mb-2 italic uppercase">
+      <div className="max-w-5xl w-full text-center flex flex-col max-h-screen py-6">
+        <h2 className="text-2xl sm:text-3xl font-black text-cyan-400 glitch-text mb-2 italic uppercase shrink-0">
           Upgrade Protocol
         </h2>
-        <p className="text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-8">
+        <p className="text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-4 sm:mb-8 shrink-0">
           Select system modification
         </p>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
-          {cards.map((mod, index) => (
-            <ModCard key={index} mod={mod} onClick={() => handleSelectMod(mod)} />
-          ))}
+        <div className="overflow-y-auto px-2 min-h-0 shrink-1 mb-4 flex-1">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+            {cards.map((mod, index) => (
+              <ModCard key={index} mod={mod} onClick={() => handleSelectMod(mod)} />
+            ))}
+          </div>
         </div>
 
-        <button 
-          onClick={handleReroll}
-          disabled={!canReroll}
-          className="reroll-btn px-8 py-3 rounded-full text-xs font-black text-white uppercase tracking-widest"
-        >
-          Reroll Protocol ({rerollText})
-        </button>
+        <div className="shrink-0 pt-2">
+          <button 
+            onClick={handleReroll}
+            disabled={!canReroll}
+            className="reroll-btn px-6 py-3 sm:px-8 rounded-full text-xs font-black text-white uppercase tracking-widest w-full sm:w-auto"
+          >
+            Reroll Protocol ({rerollText})
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -69,7 +73,7 @@ const ModCard = ({ mod, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className={`choice-card p-6 rounded-xl flex flex-col justify-between rarity-${mod.r.toLowerCase()}`}
+      className={`choice-card p-3 sm:p-6 rounded-xl flex flex-col justify-between rarity-${mod.r.toLowerCase()} sm:w-52 md:w-56 lg:w-60`}
     >
       <div>
         <div className="text-[9px] uppercase tracking-widest mb-3 opacity-50 font-bold">
