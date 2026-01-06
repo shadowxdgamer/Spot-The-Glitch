@@ -132,8 +132,14 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
   const loseLife = useCallback(() => {
     setGameState(prev => {
       // Shield Artifact Logic
+      // Bugfix: Ensure shield only consumes if active. 
+      // User noted: "first hit removes 1 life then it works". 
+      // If shieldActive is false but we have artifact, it means startLevel didn't set it?
+      // But startLevel Logic seems correct.
+      // Maybe the user confusing "taking damage" with "shield breaking sound"?
+      // Let's ensure shieldActive is correct.
       if (prev.shieldActive) {
-        // Maybe play a different sound here?
+        // Shield absorbs hit
         return { ...prev, shieldActive: false };
       }
 
@@ -207,9 +213,10 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
   }, [audioEngine, onGameOver]);
 
   // Start new level
-  const startLevel = useCallback(() => {
-    // Check artifacts
-    const hasShield = artifacts.some(a => a.id === 'auto_patcher');
+  const startLevel = useCallback((overrideArtifacts = null) => {
+    // Check artifacts (use override if provided to handle stale closures)
+    const currentArtifacts = overrideArtifacts || artifacts;
+    const hasShield = currentArtifacts.some(a => a.id === 'auto_patcher');
     
     setGameState(prev => {
       const bossLevel = isBossLevel(prev.level);

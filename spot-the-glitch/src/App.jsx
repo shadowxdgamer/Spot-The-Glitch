@@ -11,6 +11,7 @@ import { BossModal } from './features/ui/BossModal';
 import { ArtifactModal } from './features/ui/ArtifactModal';
 import { BOSSES, ARTIFACTS } from './features/boss/bossConstants';
 import { isBossLevel } from './features/game/constants';
+import { DebugMenu } from './features/debug/DebugMenu';
 import './styles/game.css';
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
   // Select Artifact and Continue
   const handleArtifactSelect = (artifact) => {
     audioEngine.sfx.success();
+    const newArtifacts = [...artifacts, artifact];
     addArtifact(artifact);
     setCurrentBoss(null); // Clear boss state
     setGamePhase('processing');
@@ -108,7 +110,7 @@ function App() {
     setTimeout(() => {
       const newLevelData = generateLevelData();
       setLevelData(newLevelData);
-      startLevel();
+      startLevel(newArtifacts); // Pass new artifacts explicitly
       setGamePhase('playing');
     }, 0);
   };
@@ -177,9 +179,57 @@ function App() {
     return () => document.removeEventListener('touchstart', preventMultiTouch);
   }, []);
 
+  const handleDebugProtocol = (mod) => {
+    if (mod.customLevel) {
+       // Manual level jump
+       const target = mod.customLevel - 1; // Logic adds +1
+       gameState.level = target; // Hack direct mutation for debug jump or better use setGameState
+       applyProtocol({ }, () => {
+         setGamePhase('processing');
+         setTimeout(() => {
+            // Check if boss level
+            if (isBossLevel(mod.customLevel)) {
+                // Find boss?
+                const bossKeys = Object.keys(BOSSES);
+                const randomBossKey = bossKeys[Math.floor(Math.random() * bossKeys.length)];
+                setCurrentBoss(BOSSES[randomBossKey]);
+                setGamePhase('bossWarning');
+            } else {
+                setCurrentBoss(null);
+                setGamePhase('playing');
+                const newLevelData = generateLevelData();
+                setLevelData(newLevelData);
+                startLevel();
+            }
+         }, 100);
+       });
+    } else {
+       // Cheats
+       applyProtocol(mod); // Time/Lives
+    }
+  };
+
+  const handleDebugBoss = (boss) => {
+      setCurrentBoss(boss);
+      setGamePhase('bossWarning');
+  };
+
+  const handleDebugArtifact = (art) => {
+      addArtifact(art);
+      audioEngine.sfx.success();
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-screen">
+    <div className="flex flex-col items-center justify-center p-4 h-screen relative">
       <div className={`fixed inset-0 bg-red-950/30 pointer-events-none transition-opacity duration-1000 z-0 ${currentBoss ? 'opacity-100' : 'opacity-0'}`} />
+      
+      {/* Debug Menu - Always available */}
+      <DebugMenu 
+        gameState={gameState} 
+        onApplyProtocol={handleDebugProtocol}
+        onAddArtifact={handleDebugArtifact}
+        onSetBoss={handleDebugBoss}
+      />
       
       {gamePhase === 'start' && <StartModal onStart={handleStartGame} />}
       

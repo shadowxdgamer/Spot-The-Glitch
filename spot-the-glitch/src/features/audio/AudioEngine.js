@@ -4,6 +4,24 @@ class AudioEngineClass {
     this.audioCtx = null;
     this.bgmAudio = null;
     this.bgmLoaded = false;
+    this.volume = { bgm: 0.3, sfx: 1.0 };
+    this.muted = false;
+  }
+
+  setVolume(type, val) { 
+      // type: 'bgm' or 'sfx', val: 0.0 to 1.0
+      this.volume[type] = Math.max(0, Math.min(1, val));
+      if (type === 'bgm' && this.bgmAudio) {
+          this.bgmAudio.volume = this.volume.bgm;
+      }
+  }
+
+  toggleMute() {
+      this.muted = !this.muted;
+      if (this.bgmAudio) {
+          this.bgmAudio.muted = this.muted;
+      }
+      return this.muted;
   }
 
   init() {
@@ -13,14 +31,18 @@ class AudioEngineClass {
   }
 
   playTone(freq, type, duration, volume = 0.1) {
-    if (!this.audioCtx) return;
+    if (!this.audioCtx || this.muted) return;
     
     const osc = this.audioCtx.createOscillator();
     const gain = this.audioCtx.createGain();
     
     osc.type = type;
     osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
-    gain.gain.setValueAtTime(volume, this.audioCtx.currentTime);
+    
+    // Apply Master SFX Volume
+    const masterVol = volume * this.volume.sfx;
+    
+    gain.gain.setValueAtTime(masterVol, this.audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
     
     osc.connect(gain);
@@ -58,7 +80,8 @@ class AudioEngineClass {
     try {
       this.bgmAudio = new Audio('/bgm/bgm.mp3');
       this.bgmAudio.loop = true;
-      this.bgmAudio.volume = 0.3;
+      this.bgmAudio.volume = this.volume.bgm;
+      this.bgmAudio.muted = this.muted;
       this.bgmLoaded = true;
     } catch (err) {
       console.warn('BGM file not found:', err);

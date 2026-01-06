@@ -4,7 +4,7 @@ export const HUD = ({ gameState }) => {
   const scoreColor = isBoss ? 'text-rose-400' : 'text-cyan-400';
 
   return (
-    <div className="w-full max-w-lg mb-4 space-y-3 z-10 transition-colors duration-500">
+    <div className="w-full max-w-lg mb-4 space-y-3 z-10 transition-colors duration-500 px-2 lg:px-0">
       <div className={`hud-panel p-4 flex justify-between items-center shadow-lg ${isBoss ? 'border-rose-900/50 bg-red-950/20' : ''}`}>
         <div className="flex flex-col">
           <span className={`text-[10px] ${themeColor} font-bold tracking-[0.2em] opacity-70 uppercase`}>

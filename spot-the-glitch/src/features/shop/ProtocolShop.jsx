@@ -85,12 +85,14 @@ const ModCard = ({ mod, onClick }) => {
         <div className="text-[10px] text-slate-300 mb-4 font-bold">
           {mod.bp && `Cleanse ${mod.bp}% of grid`}
           {mod.time && `+${mod.time}s max limit`}
-          {mod.time_m && `${mod.time_m}s global limit`}
+          {mod.time_m && mod.time_m > 0 && `+${mod.time_m}s global limit`}
           {mod.life && mod.life > 0 && `+${mod.life} Stability Node`}
           {mod.slot && `+1 Choice Slot (Next)`}
           {mod.rr && `+${mod.rr} Rerolls`}
           {mod.scr && `Scramble complexity`}
           {mod.heal && `Full System Restore`}
+          {mod.anom && mod.anom < 0 && `Remove ${Math.abs(mod.anom)} Target`}
+          {mod.gs && mod.gs < 0 && `Shrink Grid Size`}
         </div>
       </div>
       <div className="border-t border-white/5 pt-4">
@@ -101,9 +103,7 @@ const ModCard = ({ mod, onClick }) => {
           {mod.gs && mod.gs > 0 && `+${mod.gs} Array Dimension`}
           {mod.time_m && mod.time_m < 0 && `Reduced Thinking Time`}
           {mod.life && mod.life < 0 && `-1 Max Stability`}
-          {mod.gs && mod.gs < 0 && `Compact Grid`}
           {mod.anom && mod.anom > 0 && `+${mod.anom} Anomaly count`}
-          {mod.time_m && mod.time_m > 0 && `Reduced thinking time`}
         </div>
       </div>
     </div>

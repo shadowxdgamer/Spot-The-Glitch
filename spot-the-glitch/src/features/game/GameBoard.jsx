@@ -12,7 +12,7 @@ export const GameBoard = ({ levelData, gridSize, onCellClick, currentBoss, artif
     const hasLens = artifacts?.some(a => a.id === 'quantum_lens');
     if (hasLens) {
       setLensActive(true);
-      const timer = setTimeout(() => setLensActive(false), 2000);
+      const timer = setTimeout(() => setLensActive(false), 500);
       return () => clearTimeout(timer);
     }
   }, [levelData, artifacts]);
