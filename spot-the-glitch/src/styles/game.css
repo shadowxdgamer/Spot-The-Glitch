@@ -211,3 +211,34 @@ body {
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+/* PRO TIP: Boss & Artifact Styles */
+.animate-strobe {
+  animation: strobe 0.5s infinite;
+}
+@keyframes strobe {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.1; filter: brightness(0.5); }
+}
+
+.fog-obscured {
+  background: black !important;
+  color: transparent !important;
+}
+.fog-obscured:hover span, 
+.fog-obscured:active span {
+  opacity: 1 !important;
+  color: var(--neon-cyan);
+}
+.fog-obscured:hover {
+  background: rgba(30, 41, 59, 0.4) !important;
+}
+
+.lens-target {
+  animation: pulse-lens 0.5s infinite;
+  border: 1px solid var(--neon-amber) !important;
+}
+@keyframes pulse-lens {
+  0%, 100% { box-shadow: 0 0 5px var(--neon-amber); }
+  50% { box-shadow: 0 0 15px var(--neon-amber); }
+}

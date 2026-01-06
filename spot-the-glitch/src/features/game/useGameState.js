@@ -11,12 +11,17 @@ import {
   MAX_GRID_SIZE,
   MAX_CLEANSE_PERCENT,
   MIN_TIME,
-  MAX_CARD_SLOTS
+  MAX_CARD_SLOTS,
+  isBossLevel
 } from './constants';
+
+import { BOSSES } from '../boss/bossConstants';
 
 export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
   const [gameState, setGameState] = useState(INITIAL_GAME_STATE);
   const [shopFreeRerollUsed, setShopFreeRerollUsed] = useState(false);
+  const [currentBoss, setCurrentBoss] = useState(null);
+  const [artifacts, setArtifacts] = useState([]);
   const timerRef = useRef(null);
 
   // Generate level cells data
@@ -62,7 +67,6 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     return { cells, charType: type };
   }, [gameState.charTypeIdx, gameState.gridSize, gameState.targetsNeeded, gameState.cleansePercent]);
 
-  // Handle cell click
   const handleCellClick = useCallback((cellData) => {
     if (!gameState.active) return false;
 
@@ -71,16 +75,51 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
       const newTargetsFound = gameState.targetsFound + 1;
       const newScore = gameState.score + (SCORE_PER_TARGET * gameState.level);
       
-      setGameState(prev => ({
-        ...prev,
-        targetsFound: newTargetsFound,
-        score: newScore
-      }));
+      // Artifact Logic
+      const hasLifeLeech = artifacts.some(a => a.effect === 'life_leech');
+      const hasTimeFreeze = artifacts.some(a => a.effect === 'time_freeze');
+      
+      setGameState(prev => {
+        let updates = {
+          targetsFound: newTargetsFound,
+          score: newScore,
+          totalAnomaliesFound: (prev.totalAnomaliesFound || 0) + 1
+        };
 
-      if (newTargetsFound >= gameState.targetsNeeded) {
-        setGameState(prev => ({ ...prev, active: false }));
-        setTimeout(() => onLevelComplete?.(), 400);
-      }
+        // Golden Glitch: Heal every 10 targets
+        if (hasLifeLeech && updates.totalAnomaliesFound % 10 === 0) {
+           updates.lives = Math.min(prev.maxLives, prev.lives + 1);
+           // Play heal sound?
+        }
+
+        // Chrono Battery: Freeze time
+        if (hasTimeFreeze) {
+           updates.isTimeFrozen = true;
+           setTimeout(() => {
+             setGameState(curr => ({ ...curr, isTimeFrozen: false }));
+           }, 3000);
+        }
+
+        // Level Complete Check
+        if (newTargetsFound >= prev.targetsNeeded) {
+           const bossLevel = isBossLevel(prev.level);
+           
+           if (bossLevel && prev.bossLives > 1) {
+             // Boss takes damage, phase continues
+             updates.bossLives = prev.bossLives - 1;
+             updates.targetsFound = 0;
+             updates.shouldRegenerate = true;
+           } else {
+             // Level/Boss Defeated
+             updates.bossLives = 0;
+             updates.active = false;
+             setTimeout(() => onLevelComplete?.(), 400);
+           }
+        }
+        
+        return { ...prev, ...updates };
+      });
+
       return true; // Success
     } else {
       audioEngine?.sfx.failure();
@@ -92,6 +131,12 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
   // Lose a life (called when clicking wrong cell)
   const loseLife = useCallback(() => {
     setGameState(prev => {
+      // Shield Artifact Logic
+      if (prev.shieldActive) {
+        // Maybe play a different sound here?
+        return { ...prev, shieldActive: false };
+      }
+
       const newLives = prev.lives - 1;
       if (newLives <= 0) {
         clearInterval(timerRef.current);
@@ -102,13 +147,38 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     });
   }, [onGameOver]);
 
+  // Boss Mechanics Effect
+  useEffect(() => {
+    if (!gameState.active || !currentBoss) return;
+
+    let intervalId = null;
+
+    if (currentBoss.mechanic === 'shuffle') {
+      intervalId = setInterval(() => {
+        setGameState(prev => ({ ...prev, shouldRegenerate: true }));
+      }, 3000);
+    } else if (currentBoss.mechanic === 'multiply') {
+      intervalId = setInterval(() => {
+        setGameState(prev => ({ 
+          ...prev, 
+          targetsNeeded: prev.targetsNeeded + 1,
+          shouldRegenerate: true 
+        }));
+      }, 4000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [gameState.active, currentBoss]);
+
   // Timer management
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     
     timerRef.current = setInterval(() => {
       setGameState(prev => {
-        if (!prev.active) return prev;
+        if (!prev.active || prev.isTimeFrozen) return prev;
         
         const newTimeLeft = prev.timeLeft - TIMER_TICK;
         
@@ -126,7 +196,9 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
             return { ...prev, timeLeft: 0, lives: 0, active: false };
           }
           // Lose life and regenerate same level
-          return { ...prev, timeLeft: prev.maxTime, lives: newLives, targetsFound: 0, shouldRegenerate: true };
+          const bossLevel = isBossLevel(prev.level);
+          const resetTime = bossLevel ? prev.maxTime * 3 : prev.maxTime;
+          return { ...prev, timeLeft: resetTime, lives: newLives, targetsFound: 0, shouldRegenerate: true };
         }
 
         return { ...prev, timeLeft: newTimeLeft };
@@ -136,15 +208,26 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
 
   // Start new level
   const startLevel = useCallback(() => {
-    setGameState(prev => ({
-      ...prev,
-      timeLeft: prev.maxTime,
-      targetsFound: 0,
-      active: true,
-      shouldRegenerate: false
-    }));
+    // Check artifacts
+    const hasShield = artifacts.some(a => a.id === 'auto_patcher');
+    
+    setGameState(prev => {
+      const bossLevel = isBossLevel(prev.level);
+      const initialTime = bossLevel ? prev.maxTime * 3 : prev.maxTime;
+      
+      return {
+        ...prev,
+        timeLeft: initialTime,
+        maxTimeForLevel: initialTime, // Track max time for current level to fix HUD percentage
+        targetsFound: 0,
+        active: true,
+        shouldRegenerate: false,
+        shieldActive: hasShield,
+        bossLives: bossLevel ? 3 : 0
+      };
+    });
     startTimer();
-  }, [startTimer]);
+  }, [startTimer, artifacts]);
 
   // Apply protocol modification - returns updated state for immediate use
   const applyProtocol = useCallback((mod, onComplete) => {
@@ -194,21 +277,35 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setGameState({ ...INITIAL_GAME_STATE, active: true });
     setShopFreeRerollUsed(false);
+    setCurrentBoss(null);
+    setArtifacts([]);
+  }, []);
+
+  const markRegenerated = useCallback(() => {
+    setGameState(prev => ({ ...prev, shouldRegenerate: false }));
   }, []);
 
   // Consume a reroll
   const consumeReroll = useCallback(() => {
+    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market');
+    if (hasFreeMarket) return; // Free rerolls
+    
     setGameState(prev => ({
       ...prev,
       rerolls: Math.max(0, prev.rerolls - 1)
     }));
-  }, []);
+  }, [artifacts]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
+  }, []);
+
+  // Add artifact
+  const addArtifact = useCallback((artifact) => {
+    setArtifacts(prev => [...prev, artifact]);
   }, []);
 
   return {
@@ -222,6 +319,11 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     applyProtocol,
     consumeReroll,
     resetGame,
-    startTimer
+    startTimer,
+    currentBoss,
+    setCurrentBoss,
+    artifacts,
+    addArtifact,
+    markRegenerated
   };
 };

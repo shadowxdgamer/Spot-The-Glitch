@@ -25,7 +25,8 @@ export const INITIAL_GAME_STATE = {
   targetsFound: 0,
   timerId: null,
   active: false,
-  shouldRegenerate: false
+  shouldRegenerate: false,
+  bossLives: 0
 };
 
 // Scoring constants
@@ -43,3 +44,10 @@ export const MAX_GRID_SIZE = 16;
 export const MAX_CLEANSE_PERCENT = 80;
 export const MIN_TIME = 4;
 export const MAX_CARD_SLOTS = 5;
+
+// Boss levels: 10, 25, 50, 75, 100...
+export const isBossLevel = (level) => {
+  if (level === 10) return true;
+  if (level >= 25 && (level - 25) % 25 === 0) return true; // 25, 50, 75...
+  return false;
+};

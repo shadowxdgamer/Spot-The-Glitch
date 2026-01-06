@@ -7,12 +7,17 @@ import { StartModal } from './features/ui/StartModal';
 import { GameOverModal } from './features/ui/GameOverModal';
 import { GameBoard } from './features/game/GameBoard';
 import { ProtocolShop } from './features/shop/ProtocolShop';
+import { BossModal } from './features/ui/BossModal';
+import { ArtifactModal } from './features/ui/ArtifactModal';
+import { BOSSES, ARTIFACTS } from './features/boss/bossConstants';
+import { isBossLevel } from './features/game/constants';
 import './styles/game.css';
 
 function App() {
   const [gamePhase, setGamePhase] = useState('start'); // 'start' | 'playing' | 'shop' | 'gameOver'
   const [levelData, setLevelData] = useState(null);
-  const [regenerateTrigger, setRegenerateTrigger] = useState(0);
+  const [regenerateTrigger, setRegenerateTrigger] = useState(0); // Kept for Shop updates primarily if needed
+
   const { highScore, updateHighScore } = useHighScore();
   const audioEngine = useAudio();
 
@@ -36,42 +41,92 @@ function App() {
     nextLevel,
     applyProtocol,
     consumeReroll,
-    resetGame
+    resetGame,
+    currentBoss,
+    setCurrentBoss,
+    artifacts,
+    addArtifact,
+    markRegenerated
   } = useGameState(audioEngine, handleGameOver, handleLevelComplete);
 
   // Handle level progression after state is available
   useEffect(() => {
     if (gamePhase === 'checkLevel') {
-      if (gameState.level % 5 === 0) {
+      // Check if we just finished a boss level
+      if (isBossLevel(gameState.level)) {
+        audioEngine.sfx.success(); // Or special sound
+        setGamePhase('artifactReward');
+      } 
+      // Check if shop (every 5 levels, except boss levels handled above)
+      else if (gameState.level % 5 === 0) {
         audioEngine.sfx.card();
         setGamePhase('shop');
-      } else {
+      } 
+      else {
         setGamePhase('processing');
-        nextLevel();
-        setTimeout(() => {
-          const newLevelData = generateLevelData();
-          setLevelData(newLevelData);
-          startLevel();
-          setGamePhase('playing');
-        }, 0);
+        // We calculate next level here
+        const nextLvl = gameState.level + 1;
+        
+        // Check if UPCOMING level is a Boss Level
+        if (isBossLevel(nextLvl)) {
+           const bossKeys = Object.keys(BOSSES);
+           const randomBossKey = bossKeys[Math.floor(Math.random() * bossKeys.length)];
+           setCurrentBoss(BOSSES[randomBossKey]);
+           
+           nextLevel();
+           setGamePhase('bossWarning');
+        } else {
+           setCurrentBoss(null);
+           nextLevel();
+           setTimeout(() => {
+              const newLevelData = generateLevelData();
+              setLevelData(newLevelData);
+              startLevel();
+              setGamePhase('playing');
+           }, 0);
+        }
       }
     }
-  }, [gamePhase, gameState.level, audioEngine, nextLevel, generateLevelData, startLevel]);
+  }, [gamePhase, gameState.level, audioEngine, nextLevel, generateLevelData, startLevel, setCurrentBoss]);
 
-  // Regenerate board when triggered (shop upgrades or time expiration)
-  useEffect(() => {
-    if (regenerateTrigger > 0 && gamePhase === 'playing') {
+  // Start Boss Level
+  const handleBossStart = () => {
+    audioEngine.sfx.click();
+    const newLevelData = generateLevelData();
+    setLevelData(newLevelData);
+    startLevel();
+    setGamePhase('playing');
+  };
+
+  // Select Artifact and Continue
+  const handleArtifactSelect = (artifact) => {
+    audioEngine.sfx.success();
+    addArtifact(artifact);
+    setCurrentBoss(null); // Clear boss state
+    setGamePhase('processing');
+    nextLevel();
+    setTimeout(() => {
       const newLevelData = generateLevelData();
       setLevelData(newLevelData);
+      startLevel();
+      setGamePhase('playing');
+    }, 0);
+  };
+
+
+  // Regenerate board when triggered (shop upgrades, boss hits, or time expiration)
+  useEffect(() => {
+    if (gamePhase === 'playing' && (gameState.shouldRegenerate || regenerateTrigger > 0)) {
+      const newLevelData = generateLevelData();
+      setLevelData(newLevelData);
+      if (gameState.shouldRegenerate) {
+        markRegenerated();
+      }
     }
-  }, [regenerateTrigger, gamePhase, generateLevelData]);
+  }, [gameState.shouldRegenerate, regenerateTrigger, gamePhase, generateLevelData, markRegenerated]);
 
   // Handle shouldRegenerate flag from timer expiration
-  useEffect(() => {
-    if (gameState.shouldRegenerate && gamePhase === 'playing') {
-      setRegenerateTrigger(prev => prev + 1);
-    }
-  }, [gameState.shouldRegenerate, gamePhase]);
+  /* useEffect removed as it is now redundant with the combined effect above */
 
   // Start game from start modal
   const handleStartGame = async () => {
@@ -124,6 +179,8 @@ function App() {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-screen">
+      <div className={`fixed inset-0 bg-red-950/30 pointer-events-none transition-opacity duration-1000 z-0 ${currentBoss ? 'opacity-100' : 'opacity-0'}`} />
+      
       {gamePhase === 'start' && <StartModal onStart={handleStartGame} />}
       
       {gamePhase === 'gameOver' && (
@@ -144,7 +201,21 @@ function App() {
         />
       )}
 
-      {(gamePhase !== 'start' && gamePhase !== 'gameOver') && (
+      {gamePhase === 'bossWarning' && currentBoss && (
+        <BossModal 
+          boss={currentBoss} 
+          onStart={handleBossStart} 
+        />
+      )}
+
+      {gamePhase === 'artifactReward' && (
+        <ArtifactModal 
+          artifacts={ARTIFACTS} 
+          onSelect={handleArtifactSelect} 
+        />
+      )}
+
+      {(gamePhase !== 'start' && gamePhase !== 'gameOver' && gamePhase !== 'bossWarning' && gamePhase !== 'artifactReward') && (
         <>
           <HUD gameState={gameState} />
           {levelData && (
@@ -152,6 +223,8 @@ function App() {
               levelData={levelData}
               gridSize={gameState.gridSize}
               onCellClick={handleCellClick}
+              currentBoss={currentBoss}
+              artifacts={artifacts}
             />
           )}
         </>
