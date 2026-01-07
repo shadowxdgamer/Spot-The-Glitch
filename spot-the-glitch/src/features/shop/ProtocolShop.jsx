@@ -34,8 +34,10 @@ export const ProtocolShop = ({
     onSelectMod(mod);
   };
 
-  const canReroll = !shopFreeRerollUsed || gameState.rerolls > 0;
-  const rerollText = !shopFreeRerollUsed ? 'FREE' : gameState.rerolls;
+  const hasFreeMarket = gameState.artifacts?.some(a => a.effect === 'free_market');
+  const canReroll = !shopFreeRerollUsed || gameState.rerolls > 0 || hasFreeMarket;
+  let rerollText = !shopFreeRerollUsed ? 'FREE' : gameState.rerolls;
+  if (hasFreeMarket) rerollText = '∞';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl">

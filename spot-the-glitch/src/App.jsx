@@ -170,9 +170,11 @@ function App() {
 
   // Reroll shop
   const handleReroll = () => {
+    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market');
+    
     if (!shopFreeRerollUsed) {
       setShopFreeRerollUsed(true);
-    } else if (gameState.rerolls > 0) {
+    } else if (gameState.rerolls > 0 || hasFreeMarket) {
       consumeReroll();
     }
   };
