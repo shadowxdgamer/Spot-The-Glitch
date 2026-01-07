@@ -170,7 +170,7 @@ function App() {
 
   // Reroll shop
   const handleReroll = () => {
-    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market');
+    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market') || artifacts.some(a => a.id === 'neural_link');
     
     if (!shopFreeRerollUsed) {
       setShopFreeRerollUsed(true);
@@ -266,6 +266,7 @@ function App() {
           onSelectMod={handleSelectProtocol}
           onReroll={handleReroll}
           audioEngine={audioEngine}
+          artifacts={artifacts} 
         />
       )}
 

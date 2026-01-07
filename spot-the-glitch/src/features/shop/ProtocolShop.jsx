@@ -6,7 +6,8 @@ export const ProtocolShop = ({
   shopFreeRerollUsed, 
   onSelectMod, 
   onReroll,
-  audioEngine 
+  audioEngine,
+  artifacts 
 }) => {
   const [cards, setCards] = useState([]);
 
@@ -34,7 +35,7 @@ export const ProtocolShop = ({
     onSelectMod(mod);
   };
 
-  const hasFreeMarket = gameState.artifacts?.some(a => a.effect === 'free_market');
+  const hasFreeMarket = artifacts?.some(a => a.effect === 'free_market') || artifacts?.some(a => a.id === 'neural_link');
   const canReroll = !shopFreeRerollUsed || gameState.rerolls > 0 || hasFreeMarket;
   let rerollText = !shopFreeRerollUsed ? 'FREE' : gameState.rerolls;
   if (hasFreeMarket) rerollText = '∞';

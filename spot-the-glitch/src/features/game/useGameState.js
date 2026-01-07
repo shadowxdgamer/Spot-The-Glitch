@@ -300,7 +300,7 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
 
   // Consume a reroll
   const consumeReroll = useCallback(() => {
-    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market');
+    const hasFreeMarket = artifacts.some(a => a.effect === 'free_market') || artifacts.some(a => a.id === 'neural_link');
     if (hasFreeMarket) return; // Free rerolls
     
     setGameState(prev => ({
