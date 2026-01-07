@@ -231,12 +231,12 @@ function App() {
       <div className={`fixed inset-0 bg-red-950/30 pointer-events-none transition-opacity duration-1000 z-0 ${currentBoss ? 'opacity-100' : 'opacity-0'}`} />
       
       {/* Debug Menu - Always available */}
-      <DebugMenu 
+      {/* <DebugMenu 
         gameState={gameState} 
         onApplyProtocol={handleDebugProtocol}
         onAddArtifact={handleDebugArtifact}
         onSetBoss={handleDebugBoss}
-      />
+      /> */}
       
       {gamePhase === 'start' && <StartModal onStart={handleStartGame} />}
       
