@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, Volume2, VolumeX, Volume1, Github, Coffee } from 'lucide-react';
+import { Settings, Github, Coffee } from 'lucide-react';
 import { useAudio } from '../audio/useAudio';
 
 export const StartModal = ({ onStart }) => {
@@ -23,8 +23,8 @@ export const StartModal = ({ onStart }) => {
   if (showSettings) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
-        <div className="bg-slate-900/90 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-2 border-slate-500/50">
-           <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-widest">Settings</h2>
+        <div className="bg-slate-900/90 p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-t-2 border-slate-500/50 ring-1 ring-white/10">
+           <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-widest phosphor-text">Settings</h2>
            
            <div className="space-y-6 mb-8 text-left">
               <div>
@@ -62,57 +62,64 @@ export const StartModal = ({ onStart }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
-      <div className="bg-slate-900/90 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-2 border-cyan-500/50 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md overflow-hidden">
+      {/* Background Decor from game.html */}
+      <div className="absolute inset-0 pointer-events-none opacity-40 overflow-hidden z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.15)_0%,transparent_80%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px]" />
+        <div className="absolute w-full h-[100px] animate-scanline bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent pointer-events-none" />
+      </div>
+
+      <div className="bg-slate-900/95 p-10 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-t-4 border-cyan-500/50 shadow-cyan-900/20 z-20 backdrop-blur-2xl ring-1 ring-white/10 relative">
         
         {/* Settings Icon */}
         <button 
            onClick={() => setShowSettings(true)}
-           className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+           className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-30"
         >
            <Settings size={20} />
         </button>
 
-        <h1 className="text-4xl font-black mb-1 text-cyan-400 italic glitch-text tracking-tighter uppercase">
+        <h1 className="text-5xl font-black mb-1 text-cyan-400 italic glitch-text tracking-tighter uppercase">
           Spot the Glitch
         </h1>
-        <p className="text-[10px] tracking-[0.3em] text-slate-500 mb-8 uppercase font-bold">
-          Neural Link Established
+        <p className="text-[10px] tracking-[0.5em] text-slate-500 mb-8 uppercase font-bold">
+          Sector Audit Node 2.0
         </p>
         
-        <div className="text-left text-xs text-slate-400 space-y-2 mb-8 bg-black/40 p-5 rounded-lg border border-white/5 font-bold leading-relaxed">
-          <p className="text-cyan-500 opacity-80">&gt; Neural Link Established</p>
-          <p>&gt; Scan the data array</p>
-          <p>&gt; Identify non-standard artifacts</p>
-          <p>&gt; Time is finite</p>
-          <p>&gt; Accuracy is paramount</p>
+        <div className="text-left text-[11px] text-slate-400 space-y-3 mb-8 bg-black/50 p-6 rounded-2xl border border-white/10 font-bold leading-relaxed shadow-inner">
+          <p className="text-cyan-500 opacity-80 animate-pulse">{">"} SYSTEM STATUS: BREACHED</p>
+          <p>{">"} TASK: IDENTIFY DATA ANOMALIES</p>
+          <p>{">"} REWARD: PROTOCOL UPGRADES (LVL 5+)</p>
+          <p>{">"} WARNING: LEVEL 10+ REACHES CORE BREACH</p>
         </div>
 
         <button 
           onClick={onStart}
-          className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl transition-all uppercase tracking-widest shadow-lg shadow-cyan-900/40 mb-6"
+          className="w-full py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-2xl uppercase tracking-widest shadow-xl shadow-cyan-900/40 transition-all active:scale-95 group relative overflow-hidden mb-6"
         >
-          Initiate Scan
+          <span className="relative z-10">Initiate Link</span>
+          <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12" />
         </button>
 
         <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4 border-t border-slate-800">
            <a 
              href="https://github.com/shadowxdgamer/Spot-The-Glitch" 
              target="_blank" 
-             rel="noopener noreferrer" 
-             className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all text-[10px] uppercase font-bold tracking-wider flex-1 group"
+             rel="noreferrer"
+             className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-colors"
            >
-              <Github size={16} className="group-hover:scale-110 transition-transform"/>
-              <span>GitHub Repo</span>
+             <Github size={14} /> 
+             GitHub
            </a>
            <a 
-             href="https://buymeacoffee.com/shadowxdgamer" 
+             href="https://buymeacoffee.com/yourusername" 
              target="_blank" 
-             rel="noopener noreferrer" 
-             className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-900/10 hover:bg-yellow-900/30 text-yellow-600 hover:text-yellow-400 border border-yellow-700/20 hover:border-yellow-500/50 rounded-lg transition-all text-[10px] uppercase font-bold tracking-wider flex-1 group"
+             rel="noreferrer"
+             className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 rounded-lg text-xs font-bold transition-colors"
            >
-              <Coffee size={16} className="group-hover:scale-110 transition-transform"/>
-              <span>Support</span>
+             <Coffee size={14} /> 
+             Support Dev
            </a>
         </div>
       </div>
