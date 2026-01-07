@@ -107,9 +107,15 @@ export const StartModal = ({ onStart }) => {
         <h1 className="text-5xl font-black mb-1 text-cyan-400 italic glitch-text tracking-tighter uppercase">
           Spot the Glitch
         </h1>
-        <p className="text-[10px] tracking-[0.5em] text-slate-500 mb-8 uppercase font-bold">
+        <p className="text-[10px] tracking-[0.5em] text-slate-500 mb-4 uppercase font-bold">
           Sector Audit Node 2.0
         </p>
+
+        {!isFullscreen && (
+           <p className="text-[9px] text-amber-500/80 mb-6 uppercase font-bold tracking-widest animate-pulse">
+             ⚠ Note: Best Played in Fullscreen
+           </p>
+        )}
         
         <div className="text-left text-[11px] text-slate-400 space-y-3 mb-8 bg-black/50 p-6 rounded-2xl border border-white/10 font-bold leading-relaxed shadow-inner">
           <p className="text-cyan-500 opacity-80 animate-pulse">{">"} SYSTEM STATUS: BREACHED</p>
