@@ -12,7 +12,7 @@ export const GameBoard = ({ levelData, gridSize, onCellClick, currentBoss, artif
     const hasLens = artifacts?.some(a => a.id === 'quantum_lens');
     if (hasLens) {
       setLensActive(true);
-      const timer = setTimeout(() => setLensActive(false), 500);
+      const timer = setTimeout(() => setLensActive(false), 200);
       return () => clearTimeout(timer);
     }
   }, [levelData, artifacts]);
@@ -28,7 +28,8 @@ export const GameBoard = ({ levelData, gridSize, onCellClick, currentBoss, artif
     }));
   };
 
-  const fontSize = Math.max(10, Math.min(32, 450 / gridSize));
+  // Adjusted for responsive grid (was 450)
+  const fontSize = Math.max(8, Math.min(32, 300 / gridSize));
   
   // Boss Mechanics CSS
   const isFog = currentBoss?.mechanic === 'fog_of_war';

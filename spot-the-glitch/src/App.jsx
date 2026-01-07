@@ -227,7 +227,15 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-screen relative">
+    <div 
+      className="flex flex-col items-center justify-center p-4 min-h-[100dvh] w-full relative bg-[#020617] overflow-hidden"
+      style={{
+        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+        paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right))'
+      }}
+    >
       <div className={`fixed inset-0 bg-red-950/30 pointer-events-none transition-opacity duration-1000 z-0 ${currentBoss ? 'opacity-100' : 'opacity-0'}`} />
       
       {/* Debug Menu - Always available */}

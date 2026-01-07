@@ -2,7 +2,7 @@ export const BOSSES = {
   THE_VOID: {
     id: 'the_void',
     name: 'The Void',
-    description: 'Visual sensors compromised. Data only visible via localized scan.',
+    description: 'Visual sensors compromised. Data only visible via localized scan. WARNING: On Mobile, Touch & HOLD to scan sectors!',
     mechanic: 'fog_of_war', // Mobile: Touch & Hold to scan, Tap to select. Desktop: Hover scan.
     icon: '👁️'
   },

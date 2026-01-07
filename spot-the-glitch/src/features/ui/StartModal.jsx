@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Settings, Github, Coffee } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Settings, Github, Coffee, Maximize, Minimize } from 'lucide-react';
 import { useAudio } from '../audio/useAudio';
 
 export const StartModal = ({ onStart }) => {
@@ -7,6 +7,21 @@ export const StartModal = ({ onStart }) => {
   const audioEngine = useAudio();
   const [bgmVol, setBgmVol] = useState(30);
   const [sfxVol, setSfxVol] = useState(100);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handleChange);
+    return () => document.removeEventListener('fullscreenchange', handleChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   const handleBgmChange = (e) => {
     const val = parseInt(e.target.value);
@@ -78,6 +93,15 @@ export const StartModal = ({ onStart }) => {
            className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-30"
         >
            <Settings size={20} />
+        </button>
+
+        {/* Fullscreen Toggle - Top Left */}
+        <button 
+          onClick={toggleFullscreen}
+          className="absolute top-6 left-6 text-slate-500 hover:text-white transition-colors z-30"
+          title="Toggle Fullscreen"
+        >
+          {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
         </button>
 
         <h1 className="text-5xl font-black mb-1 text-cyan-400 italic glitch-text tracking-tighter uppercase">

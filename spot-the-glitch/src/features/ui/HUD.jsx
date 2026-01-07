@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 export const HUD = ({ gameState }) => {
   const isBoss = gameState.bossLives > 0;
   const themeColor = isBoss ? 'text-rose-500' : 'text-cyan-500';
@@ -5,7 +7,8 @@ export const HUD = ({ gameState }) => {
 
   return (
     <div className="w-full max-w-lg mb-4 space-y-3 z-10 transition-colors duration-500 px-2 lg:px-0">
-      <div className={`hud-panel p-4 flex justify-between items-center shadow-lg ${isBoss ? 'border-rose-900/50 bg-red-950/20' : ''}`}>
+      <div className={`hud-panel p-4 flex justify-between items-center shadow-lg relative ${isBoss ? 'border-rose-900/50 bg-red-950/20' : ''}`}>
+        
         <div className="flex flex-col">
           <span className={`text-[10px] ${themeColor} font-bold tracking-[0.2em] opacity-70 uppercase`}>
             Sector

@@ -39,6 +39,21 @@ export const DebugMenu = ({ gameState, onApplyProtocol, onAddArtifact, onSetBoss
         </div>
 
         <div className="space-y-2">
+          <label className="text-xs text-slate-400 block">Grid Dimension</label>
+          <div className="flex gap-2">
+            {[4, 8, 13, 16].map(size => (
+              <button 
+                key={size}
+                onClick={() => onApplyProtocol({ customGridSize: size })}
+                className="px-2 py-1 bg-purple-600 rounded text-xs"
+              >
+                {size}x{size}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
           <label className="text-xs text-slate-400 block">Spawn Boss</label>
           <div className="grid grid-cols-2 gap-2">
             {Object.values(BOSSES).map(boss => (

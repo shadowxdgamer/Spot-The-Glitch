@@ -237,11 +237,16 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
     startTimer();
   }, [startTimer, artifacts]);
 
-  // Apply protocol modification - returns updated state for immediate use
+  // Apply protocol modification
   const applyProtocol = useCallback((mod, onComplete) => {
     setGameState(prev => {
       const updated = { ...prev };
       
+      // Debug/Direct Overrides
+      if (mod.customLevel) updated.level = mod.customLevel;
+      if (mod.customGridSize) updated.gridSize = mod.customGridSize;
+
+      // Standard Modifiers
       if (mod.bp) updated.cleansePercent = Math.min(MAX_CLEANSE_PERCENT, updated.cleansePercent + mod.bp);
       if (mod.gs) updated.gridSize = Math.max(4, Math.min(MAX_GRID_SIZE, updated.gridSize + mod.gs));
       if (mod.anom) updated.targetsNeeded = Math.max(1, updated.targetsNeeded + mod.anom);

@@ -77,8 +77,8 @@ body {
 /* Grid and cells */
 .grid-container {
   display: grid;
-  gap: 6px;
-  width: 95vw;
+  gap: 4px;
+  width: min(95vw, 60dvh);
   max-width: 550px;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
