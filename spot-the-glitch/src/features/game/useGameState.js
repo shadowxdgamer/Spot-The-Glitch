@@ -140,6 +140,7 @@ export const useGameState = (audioEngine, onGameOver, onLevelComplete) => {
       // Let's ensure shieldActive is correct.
       if (prev.shieldActive) {
         // Shield absorbs hit
+        audioEngine?.sfx.shield();
         return { ...prev, shieldActive: false };
       }
 

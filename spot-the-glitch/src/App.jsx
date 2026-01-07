@@ -150,6 +150,13 @@ function App() {
     audioEngine.playBGM();
   };
 
+  // Return to home screen
+  const handleHome = () => {
+    resetGame();
+    setGamePhase('start');
+    audioEngine.stopBGM();
+  };
+
   // Apply protocol and continue
   const handleSelectProtocol = (mod) => {
     applyProtocol(mod, (updatedState) => {
@@ -237,7 +244,8 @@ function App() {
         <GameOverModal 
           score={gameState.score} 
           highScore={highScore}
-          onRestart={handleRestart} 
+          onRestart={handleRestart}
+          onHome={handleHome}
         />
       )}
 

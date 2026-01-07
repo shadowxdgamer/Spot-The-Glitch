@@ -70,6 +70,17 @@ class AudioEngineClass {
     card: () => {
       this.playTone(400, 'square', 0.05, 0.02);
       setTimeout(() => this.playTone(600, 'square', 0.05, 0.02), 30);
+    },
+
+    shield: () => {
+      if (this.muted) return;
+      try {
+        const audio = new Audio('/sfx/shield.wav');
+        audio.volume = this.volume.sfx;
+        audio.play().catch(e => console.warn('Shield SFX error', e));
+      } catch (e) {
+        console.warn('Audio play failed', e);
+      }
     }
   };
 

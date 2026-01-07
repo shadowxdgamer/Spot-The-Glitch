@@ -1,4 +1,4 @@
-export const GameOverModal = ({ score, highScore, onRestart }) => {
+export const GameOverModal = ({ score, highScore, onRestart, onHome }) => {
   const isNewHighScore = score >= highScore && score > 0;
 
   return (
@@ -27,12 +27,21 @@ export const GameOverModal = ({ score, highScore, onRestart }) => {
           )}
         </div>
         
-        <button 
-          onClick={onRestart}
-          className="w-full py-4 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-black rounded-xl transition-all border border-cyan-900/50 uppercase tracking-widest"
-        >
-          Reboot System
-        </button>
+        <div className="space-y-3">
+          <button 
+            onClick={onRestart}
+            className="w-full py-4 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-black rounded-xl transition-all border border-cyan-900/50 uppercase tracking-widest"
+          >
+            Reboot System
+          </button>
+
+          <button 
+            onClick={onHome}
+            className="w-full py-3 bg-transparent hover:bg-slate-800/50 text-slate-500 hover:text-white font-bold rounded-xl transition-all uppercase tracking-widest text-xs"
+          >
+            Return to Terminal
+          </button>
+        </div>
       </div>
     </div>
   );
