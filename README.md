@@ -4,8 +4,6 @@
 
 ![Gameplay Screenshot](./screenshots/gameplay.png)
 
-> *Note: Place your screenshots in a `screenshots` folder in the root directory.*
-
 ## Features
 
 - **High-Speed Perception:** Rapidly identify the anomalous character in a grid of alphanumeric data.
